@@ -19,25 +19,19 @@ namespace c2cUniversitees.Models
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
 
-        // لتصنيف المنتج (مثل: أدوات تخرج، كتب)
         public string Category { get; set; }
 
-        // اسم ملف الصورة المخزن
         public string ImagePath { get; set; }
 
         [Display(Name = "حالة البيع")]
-        public bool IsSold { get; set; } = false; // القيمة الافتراضية: لم يُبع بعد
+        public bool IsSold { get; set; } = false; 
 
         public DateTime PostedDate { get; set; } = DateTime.Now;
 
-        // **علاقة مفتاح خارجي (Foreign Key) مع البائع:**
-
-        // 1. المفتاح الخارجي الذي يشير إلى ID البائع (تغير من string إلى int)
         [Required]
         public int SellerId { get; set; }
 
-        // 2. خاصية الملاحة (Navigation Property)
         [ForeignKey("SellerId")]
-        public User Seller { get; set; } // يجب أن يشير إلى نموذج User الجديد
+        public User Seller { get; set; } 
     }
 }

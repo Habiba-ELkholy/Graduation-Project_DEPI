@@ -4,7 +4,7 @@ namespace c2cUniversitees.Models
 {
     public class ProductViewModel
     {
-        // خصائص المنتج العادية
+        
         [Required(ErrorMessage = "العنوان مطلوب."), StringLength(100)]
         public string Title { get; set; }
         public string Description { get; set; }
@@ -16,7 +16,7 @@ namespace c2cUniversitees.Models
 
         public string Category { get; set; }
 
-        // خاصية لاستقبال ملف الصورة من النموذج
+        
         [Required(ErrorMessage = "الرجاء رفع صورة للمنتج.")]
         [Display(Name = "صورة المنتج")]
         public IFormFile ImageFile { get; set; }

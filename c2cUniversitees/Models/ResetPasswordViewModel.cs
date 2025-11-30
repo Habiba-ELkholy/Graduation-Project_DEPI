@@ -5,7 +5,7 @@ namespace c2cUniversitees.Models
     public class ResetPasswordViewModel
     {
         [Required]
-        public string Token { get; set; } // الرمز المميز (مخفي)
+        public string Token { get; set; } 
 
         [Required(ErrorMessage = "كلمة المرور الجديدة مطلوبة.")]
         [DataType(DataType.Password)]

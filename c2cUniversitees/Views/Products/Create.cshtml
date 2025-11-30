@@ -112,9 +112,7 @@
     }
 
     <script>
-        // تحسينات تفاعلية للنموذج
         document.addEventListener('DOMContentLoaded', function() {
-            // تأثيرات لحقول الإدخال
             const inputs = document.querySelectorAll('.form-control');
             inputs.forEach(input => {
                 input.addEventListener('focus', function() {
@@ -128,7 +126,6 @@
                 });
             });
 
-            // عرض اسم الملف المختار
             const fileInput = document.querySelector('input[type="file"]');
             const fileLabel = document.querySelector('.file-input-label');
 
@@ -140,8 +137,7 @@
                     fileLabel.style.background = '#f0f4ff';
                 }
             });
-
-            // التحقق من الصحة قبل الإرسال
+            
             const form = document.querySelector('.needs-validation');
             form.addEventListener('submit', function(event) {
                 if (!form.checkValidity()) {

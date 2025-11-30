@@ -1,12 +1,10 @@
--- гАньФи 1: еДтга чгзои гАхМгДгй
+
 CREATE DATABASE c2cUniversiteesDB;
 GO
 
--- гАньФи 2: гАйхоМА АгсйногЦЕг
 USE c2cUniversiteesDB;
 GO
 
--- гАньФи 3: еДтга лоФА гАЦсйноЦМД
 CREATE TABLE Users (
     UserId INT PRIMARY KEY IDENTITY(1,1),
     Username NVARCHAR(50) NOT NULL,
@@ -18,7 +16,6 @@ CREATE TABLE Users (
 );
 GO
 
--- гАньФи 4: еДтга лоФА гАЦДйлгй
 CREATE TABLE Products (
     ProductId INT PRIMARY KEY IDENTITY(1,1),
     Title NVARCHAR(100) NOT NULL,

@@ -1,155 +1,0 @@
-﻿@model c2cUniversitees.Models.ProductViewModel
-@using c2cUniversitees.Utilities
-
-@{
-    ViewData["Title"] = "إضافة منتج جديد للبيع";
-}
-
-<style>
-
-</style>
-
-<div class="product-form-container">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-xl-7">
-                <div class="card product-form-card p-4 p-md-5">
-
-                    <div class="form-header">
-                        <h2 class="form-title">🎁 أعرض منتجك للبيع</h2>
-                        <p class="form-subtitle">املأ التفاصيل بدقة لزيادة فرص البيع السريع</p>
-                    </div>
-
-                    <form asp-action="Create" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
-
-                        <div class="form-section">
-                            <h5 class="fw-bold mb-3" style="color: #374151;">المعلومات الأساسية</h5>
-
-                            <div class="row">
-                                <div class="col-md-7">
-                                    <div class="form-group">
-                                        <label asp-for="Title" class="form-label required-field">عنوان المنتج</label>
-                                        <input asp-for="Title" class="form-control" placeholder="أدخل عنوان واضح وجذاب للمنتج" required />
-                                        <span asp-validation-for="Title" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label asp-for="Price" class="form-label required-field">السعر (جنيه مصري)</label>
-                                        <input asp-for="Price" class="form-control" type="number"  required />
-                                        <span asp-validation-for="Price" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label asp-for="Description" class="form-label required-field">وصف المنتج</label>
-                                <textarea asp-for="Description" class="form-control" rows="4" placeholder="صف منتجك بدقة... الحالة، العيوب، المميزات، سبب البيع" required></textarea>
-                                <span asp-validation-for="Description" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h5 class="fw-bold mb-3" style="color: #374151;">التصنيف والوسائط</h5>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="Category" class="form-label required-field">التصنيف</label>
-                                        <select asp-for="Category" class="form-control" required>
-                                            <option value="">-- اختر التصنيف --</option>
-                                            @if (ViewBag.Categories != null)
-                                            {
-                                                foreach (var cat in ViewBag.Categories)
-                                                {
-                                                    <option value="@cat">@cat</option>
-                                                }
-                                            }
-                                        </select>
-                                        <small class="form-text">مثال: كتب دراسية، أجهزة إلكترونية، أدوات تخرج</small>
-                                        <span asp-validation-for="Category" class="text-danger"></span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="ImageFile" class="form-label required-field">صورة المنتج</label>
-                                        <div class="file-input">
-                                            <input asp-for="ImageFile" type="file" class="form-control" required accept="image/*" />
-                                            <label for="ImageFile" class="file-input-label">
-                                                <i class="fas fa-cloud-upload-alt me-2"></i>
-                                                اختر صورة المنتج
-                                            </label>
-                                        </div>
-                                        <span asp-validation-for="ImageFile" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group mt-4">
-                            <button type="submit" class="btn btn-submit">
-                                <i class="fas fa-upload me-2"></i> إضافة المنتج للمنصة
-                            </button>
-                        </div>
-
-                        <div class="text-center mt-3">
-                            <a asp-action="Index" class="btn-back">
-                                <i class="fas fa-arrow-right me-1"></i> العودة إلى القائمة
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
-    <script>
-        // تحسينات تفاعلية للنموذج
-        document.addEventListener('DOMContentLoaded', function() {
-            // تأثيرات لحقول الإدخال
-            const inputs = document.querySelectorAll('.form-control');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.classList.add('focused');
-                });
-
-                input.addEventListener('blur', function() {
-                    if (this.value === '') {
-                        this.parentElement.classList.remove('focused');
-                    }
-                });
-            });
-
-            // عرض اسم الملف المختار
-            const fileInput = document.querySelector('input[type="file"]');
-            const fileLabel = document.querySelector('.file-input-label');
-
-            fileInput.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    fileLabel.innerHTML = '<i class="fas fa-check me-2"></i> ' + this.files[0].name;
-                    fileLabel.style.borderColor = '#7877C6';
-                    fileLabel.style.color = '#7877C6';
-                    fileLabel.style.background = '#f0f4ff';
-                }
-            });
-
-            // التحقق من الصحة قبل الإرسال
-            const form = document.querySelector('.needs-validation');
-            form.addEventListener('submit', function(event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    </script>
-}

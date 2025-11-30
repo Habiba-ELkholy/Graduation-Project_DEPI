@@ -1,220 +1,0 @@
-﻿@using c2cUniversitees.Utilities
-@using Microsoft.AspNetCore.Http
-@model IEnumerable<c2cUniversitees.Models.Product>
-
-@{
-    ViewData["Title"] = "سوق الجامعة للمستعمل";
-    int? currentUserId = Context.Session.GetInt32("UserId");
-}
-
-<style>
-
-</style>
-
-<div class="products-container">
-    <div class="container">
-
-       
-        <div class="page-header fade-in">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="page-title">🛒 سوق الجامعة للمستعمل</h1>
-                    <p class="text-muted mb-0">منصة طلابية موثوقة لبيع وشراء المستلزمات الدراسية</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <a asp-controller="Products" asp-action="Create" class="add-product-btn">
-                        <i class="fas fa-plus-circle"></i> أضف منتجك الآن
-                    </a>
-                </div>
-            </div>
-        </div>
-
-      
-        <div class="filter-section fade-in">
-            <div class="row align-items-center">
-                <div class="col-md-5">
-                    <label for="collegeFilter" class="filter-label">🏛️ تصفية حسب كلية البائع</label>
-                    <select id="collegeFilter" class="form-select filter-select" onchange="window.location.href = this.value;">
-                        @foreach (var option in (List<Tuple<string, bool>>)ViewBag.FilterOptions)
-                        {
-                            @if (option.Item2)
-                            {
-                                <option value="@Url.Action("Index", "Products", new { college = option.Item1 })" selected>
-                                    @option.Item1
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="@Url.Action("Index", "Products", new { college = option.Item1 })">
-                                    @option.Item1
-                                </option>
-                            }
-                        }
-                    </select>
-                </div>
-
-                <div class="col-md-7 text-md-end">
-                    <div class="products-count">
-                        <i class="fas fa-box-open me-2"></i>
-                        تم عرض @Model.Count() منتج متاح للبيع
-                    </div>
-                </div>
-            </div>
-        </div>
-
-       
-        @if (Model.Any())
-        {
-            <div class="row">
-                @foreach (var item in Model)
-                {
-                    <div class="col-xl-3 col-lg-4 col-md-6 mb-4 fade-in">
-                        <div class="card product-card">
-
-                          
-                            <div class="product-image-container">
-                                @{
-                                    // بنجيب القائمة من الباك إند
-                                    var wishlist = ViewBag.WishlistIds as List<int>;
-                                    // بنشوف هل المنتج الحالي موجود فيها ولا لأ
-                                    bool isLiked = wishlist != null && wishlist.Contains(item.ProductId);
-                                }
-
-                                <a asp-controller="Wishlist" asp-action="Toggle" asp-route-productId="@item.ProductId"
-                                   class="btn btn-light rounded-circle shadow-sm position-absolute"
-                                   style="top: 10px; right: 10px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 10;">
-
-                                    <i class="@(isLiked ? "fas" : "far") fa-heart text-danger" style="font-size: 1.2rem;"></i>
-                                </a>
-                                @if (!string.IsNullOrEmpty(item.ImagePath))
-                                {
-                                    <img src="@($"/images/{item.ImagePath}")"
-                                         alt="@item.Title"
-                                         class="product-image">
-                                }
-                                else
-                                {
-                                    <div class="no-image-placeholder">
-                                        <i class="fas fa-image fa-2x"></i>
-                                    </div>
-                                }
-                        </div>
-
-                       
-                        <div class="product-body">
-
-                            
-                            <h5 class="product-title">@item.Title</h5>
-                            <div class="product-price">
-                                <i class="fas fa-tag"></i>
-                                <h5 class="fw-bold">@item.Price جنيه</h5>
-                            </div>
-                            <div class="card-footer bg-white border-0">
-                                
-                            </div>
-                            <p class="product-description">
-                                @(item.Description != null && item.Description.Length > 100 ?
-                                                            item.Description.Substring(0, 100) + "..." : item.Description)
-
-                        </p>
-                        <br >
-                        
-                        <a asp-action="Details" asp-route-id="@item.ProductId" class="btn btn-outline-primary w-100">
-                            تفاصيل المنتج 📄
-                        </a>
-                               
-                                <div class="product-meta">
-                                    <div class="meta-item">
-                                        <i class="fas fa-tags" style="color: #7877C6;"></i>
-                                        <span>التصنيف:</span>
-                                        <span class="category-badge">@item.Category</span>
-                                    </div>
-
-                            @if (item.Seller != null)
-                                    {
-                                        <div class="meta-item">
-                                            <i class="fas fa-user" style="color: #8b5cf6;"></i>
-                                            <span>البائع:</span>
-                                            <span class="fw-bold">@item.Seller.Username</span>
-                                        </div>
-                                        <div class="meta-item">
-                                            <i class="fas fa-graduation-cap" style="color: #7877C6;"></i>
-                                            <span>الكلية:</span>
-                                            <span class="college-badge">@item.Seller.CollegeName</span>
-                                        </div>
-                                    }
-                                </div>
-
-                               
-                                <div class="product-actions">
-                                   
-
-                                    @if (currentUserId.HasValue && item.SellerId == currentUserId.Value)
-                                    {
-                                        <form asp-controller="Products" asp-action="Sold"
-                                              asp-route-id="@item.ProductId" method="post"
-                                              onsubmit="return confirm('هل أنت متأكد من بيع هذا المنتج؟ سيتم إزالته من القائمة.');">
-                                            @Html.AntiForgeryToken()
-                                            <a asp-action="Details" asp-route-id="@item.ProductId" class="btn btn-outline-primary w-100 mt-2">
-                                                تفاصيل المنتج 📄
-                                            </a>
-                                            <button type="submit" class="sold-btn">
-                                                <i class="fas fa-check-circle"></i>
-                                                تم البيع
-                                            </button>
-                                        </form>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-          
-            <div class="no-products fade-in">
-                <div class="no-products-icon">
-                    <i class="fas fa-box-open"></i>
-                </div>
-                <h3 class="no-products-title">لا يوجد منتجات معروضة حالياً!</h3>
-                <p class="no-products-text">
-                    كن أول من يعرض منتجًا للبيع في منصتنا الطلابية الموثوقة<br>
-                    سجل منتجك الآن وابدأ رحلتك في البيع والشراء الآمن
-                </p>
-                <a asp-controller="Products" asp-action="Create" class="add-product-btn">
-                    <i class="fas fa-plus-circle"></i> أضف منتجك الآن
-                </a>
-            </div>
-        }
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-       
-        const productCards = document.querySelectorAll('.product-card');
-
-        productCards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-8px)';
-            });
-
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
-
-       
-        const filterSelect = document.getElementById('collegeFilter');
-        if (filterSelect) {
-            filterSelect.addEventListener('change', function() {
-                this.style.opacity = '0.7';
-                setTimeout(() => {
-                    this.style.opacity = '1';
-                }, 300);
-            });
-        }
-    });
-</script>

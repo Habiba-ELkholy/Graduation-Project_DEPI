@@ -2,10 +2,6 @@
     ViewData["Title"] = "الصفحة الرئيسية";
 }
 
-<style>
-    /* أنماط الصفحة الرئيسية المعدلة */
-
-</style>
 
 <div class="hero-homepage">
     <div class="hero-content">
@@ -102,9 +98,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
-        // إضافة تأثيرات scroll animation
         document.addEventListener('DOMContentLoaded', function() {
-            // تأثيرات الظهور عند التمرير
+            
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
@@ -118,12 +113,12 @@
                 });
             }, observerOptions);
 
-            // مراقبة العناصر لإضافة تأثيرات الظهور
+            
             document.querySelectorAll('.feature-card').forEach(el => {
                 observer.observe(el);
             });
 
-            // تأثيرات إضافية للأزرار
+            
             const buttons = document.querySelectorAll('.btn-hero');
             buttons.forEach(button => {
                 button.addEventListener('mouseenter', function() {

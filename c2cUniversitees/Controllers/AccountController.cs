@@ -37,73 +37,43 @@ namespace c2cUniversitees.Controllers
             }
         }
 
-        // ===============================================
-        // A. تسجيل الدخول (Login)
-
-
-        // ===============================================
-        // داخل AccountController.cs
-
-        // ===============================================
-        // A. تسجيل الدخول (Login)
-        // ===============================================
-
-        // دالة GET: لعرض نموذج تسجيل الدخول
+       
         [HttpGet]
         public IActionResult Login()
         {
-            // ببساطة ترجع الواجهة (View) باسم "Login.cshtml"
             return View();
         }
 
-        // ... يتبعها دالة Login (POST) التي قمنا بتعديلها ...
-
-        // ===============================================
-        // B. إنشاء حساب جديد (Register)
-        // ===============================================
-
-        // دالة GET: لعرض نموذج التسجيل
         [HttpGet]
         public IActionResult Register()
         {
-            // يجب تمرير قائمة الكليات إلى الـ View
             ViewBag.CollegeList = c2cUniversitees.Utilities.CollegeData.CollegeNames;
             return View();
         }
 
-        // ... يتبعها دالة Register (POST) التي قمنا بتعديلها ...
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
-            // 1. التحقق من المدخلات الفارغة
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 ViewBag.Error = "الرجاء إدخال البريد وكلمة المرور.";
                 return View();
             }
 
-            // 2. تشفير كلمة المرور المُدخلة للبحث في قاعدة البيانات
             string hashedPassword = HashPassword(password);
 
-            // 3. البحث عن المستخدم بالإيميل وكلمة المرور المُشفرة
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == email && u.Password == hashedPassword);
 
-            // 4. التحقق من نجاح تسجيل الدخول
             if (user != null)
             {
-                // ==========================================================
-                // الخطوة 4.1: المصادقة الرسمية باستخدام Claims و Cookies
-                // ==========================================================
-
-                // إنشاء المطالبات (Claims) لتمثيل هوية المستخدم
                 var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // الـ ID الأساسي للمستخدم
-            new Claim(ClaimTypes.Name, user.Username), // اسم المستخدم
-            new Claim("College", user.CollegeName) // المطالبة الخاصة بالكلية
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), 
+            new Claim(ClaimTypes.Name, user.Username), 
+            new Claim("College", user.CollegeName) 
         };
 
                 var claimsIdentity = new ClaimsIdentity(
@@ -111,43 +81,28 @@ namespace c2cUniversitees.Controllers
 
                 var authProperties = new AuthenticationProperties
                 {
-                    // يمكن تحديد خصائص مثل isPersistent = true; (تذكرني)
                     IsPersistent = false
                 };
 
-                // تسجيل الدخول الرسمي (يجب أن يتطابق مع المخطط المحدد في Program.cs)
                 await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme, // استخدام المخطط الافتراضي لـ Cookies
+                    CookieAuthenticationDefaults.AuthenticationScheme, 
                     new ClaimsPrincipal(claimsIdentity),
                     authProperties);
 
-                // ==========================================================
-                // الخطوة 4.2: تخزين بيانات سريعة في الجلسة (اختياري لكن مفيد)
-                // ==========================================================
                 HttpContext.Session.SetInt32("UserId", user.UserId);
                 HttpContext.Session.SetString("Username", user.Username);
 
-                // 5. التوجيه عند النجاح
                 return RedirectToAction("Index", "Products");
             }
 
-            // 6. إذا فشلت المصادقة
             ViewBag.Error = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
             return View();
         }
 
-        // ===============================================
-        // B. إنشاء حساب جديد (Register)
-        // ===============================================
-
-  
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // ملاحظة: يجب تعديل هذه الدالة لتطبيق قواعد النطاق الجامعي (التي ناقشناها سابقاً)
         public async Task<IActionResult> Register([Bind("Username,Email,Password,CollegeName")] User newUser)
         {
-            // ... (منطق التحقق من النطاق الجامعي هنا) ...
 
             if (ModelState.IsValid)
             {
@@ -170,35 +125,22 @@ namespace c2cUniversitees.Controllers
             return View(newUser);
         }
 
-        // ===============================================
-        // C. تسجيل الخروج (Logout)
-        // ===============================================
 
         public async Task<IActionResult> Logout()
         {
-            // 1. إنهاء جلسة المصادقة الرسمية (إزالة الكوكيز)
-            // نستخدم اسم المخطط الافتراضي لضمان التوافق مع الإعدادات في Program.cs
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            // 2. إزالة بيانات الجلسة (Sessions) لضمان التنظيف الكامل
             HttpContext.Session.Clear();
 
-            // 3. التوجيه إلى الصفحة الرئيسية
             return RedirectToAction("Index", "Home");
         }
 
-        // ===============================================
-        // D. نسيان كلمة المرور (Forgot Password)
-        // ===============================================
-
-        // 1. عرض نموذج نسيان كلمة المرور (GET) - توقيع وحيد
         [HttpGet]
         public IActionResult ForgotPassword()
         {
             return View();
         }
 
-        // 2. معالجة طلب نسيان كلمة المرور (POST) - توقيع وحيد
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(string email)
@@ -211,7 +153,6 @@ namespace c2cUniversitees.Controllers
                 return View();
             }
 
-            // **البريد موجود: استكمال عملية الإرسال**
 
             string resetToken = Guid.NewGuid().ToString("N");
             user.ResetToken = resetToken;
@@ -250,11 +191,6 @@ namespace c2cUniversitees.Controllers
             return View();
         }
 
-        // ===============================================
-        // E. إعادة تعيين كلمة المرور (Reset Password)
-        // ===============================================
-
-        // عرض نموذج إعادة تعيين كلمة المرور (GET)
         public IActionResult ResetPassword(string token)
         {
             if (string.IsNullOrEmpty(token))
@@ -266,7 +202,6 @@ namespace c2cUniversitees.Controllers
             return View(new ResetPasswordViewModel { Token = token });
         }
 
-        // معالجة طلب تحديث كلمة المرور (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)

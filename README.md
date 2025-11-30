@@ -10,10 +10,10 @@ A C2C web application for university students to buy and sell used educational m
 * **College Filtering:** Filter products based on faculty.
 
 ## 👥 Team Members 
-**Habiba Emad Mohammed Elkholy**
-**Radwa Elmodather Adly**
-**Sotir Milad**
-**Walaa Rafat**
+* **Habiba Emad Mohammed Elkholy**
+* **Radwa Elmodather Adly**
+* **Sotir Milad**
+* **Walaa Rafat**
 
 ---
 *Graduation Project - DEPI 2025*

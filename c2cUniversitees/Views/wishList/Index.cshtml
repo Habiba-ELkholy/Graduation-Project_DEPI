@@ -1,0 +1,42 @@
+﻿@model IEnumerable<c2cUniversitees.Models.WishlistItem>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">❤️ قائمتي المفضلة</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            قائمتك فارغة حالياً. <a href="/Products">تصفح المنتجات</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <img src="@(string.IsNullOrEmpty(item.Product.ImagePath) ? "https://placehold.co/600x400" : $"/images/{item.Product.ImagePath}")"
+                             class="card-img-top"
+                             style="height: 200px; object-fit: cover;"
+                             alt="@item.Product.Title">
+                             @* class="card-img-top" style="height: 200px; object-fit: cover;"> *@
+
+                        <div class="card-body text-center">
+                            <h5>@item.Product.Title</h5>
+                            <p class="text-primary fw-bold">@item.Product.Price ج.م</p>
+
+                            <a asp-action="Toggle" asp-route-productId="@item.ProductId" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-trash"></i> حذف
+                            </a>
+
+                            <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" class="btn btn-primary btn-sm">
+                                شراء 🛒
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,59 @@
+﻿@using Microsoft.AspNetCore.Http
+@model IEnumerable<c2cUniversitees.Models.Message>
+@{
+    ViewData["Title"] = "محادثاتي";
+    int myId = ViewBag.CurrentUserId;
+
+  
+    var uniqueChats = Model
+        .GroupBy(m => m.SenderId == myId ? m.ReceiverId : m.SenderId)
+        .Select(g => g.OrderByDescending(m => m.Timestamp).First())
+        .ToList();
+}
+
+<div class="container mt-5">
+    <h3 class="mb-4">💬 محادثاتك</h3>
+
+    <div class="list-group shadow-sm">
+        @if (!uniqueChats.Any())
+        {
+            <div class="alert alert-info text-center">لا توجد محادثات حتى الآن.</div>
+        }
+        else
+        {
+            @foreach (var chat in uniqueChats)
+            {
+                int otherPersonId = chat.SenderId == myId ? chat.ReceiverId : chat.SenderId;
+                string otherPersonName = chat.SenderId == myId ? "الطرف الآخر" : chat.Sender.Username;
+
+                bool hasUnread = chat.SenderId != myId && !chat.IsRead;
+
+                <a asp-action="Index" asp-route-receiverId="@otherPersonId"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 @(hasUnread ? "bg-light border-primary" : "")">
+
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center me-3"
+                             style="width: 50px; height: 50px; font-size: 1.2rem;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 fw-bold">
+                                @(chat.SenderId == myId ? chat.Receiver.Username : chat.Sender.Username)
+
+                                @if (hasUnread)
+                                {
+                                    <span class="badge bg-danger ms-2" style="font-size: 0.7rem;">رسالة جديدة</span>
+                                }
+                            </h5>
+                            <p class="mb-0 text-muted small text-truncate" style="max-width: 250px;">
+                                @(chat.SenderId == myId ? "أنت: " : "") @chat.Content
+                            </p>
+                        </div>
+                    </div>
+
+                    <small class="text-muted">@chat.Timestamp.ToString("dd/MM hh:mm tt")</small>
+                </a>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,128 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<c2cUniversitees.Models.Message>
+
+@{
+    ViewData["Title"] = "الدردشة";
+    
+   
+    var myId = HttpContextAccessor.HttpContext.Session.GetInt32("UserId");
+    
+    int currentUserId = myId ?? 1;
+}
+
+<div class="container mt-3 p-0" style="max-width: 600px;">
+
+    <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white sticky-top">
+        <div class="d-flex align-items-center">
+            <a href="/Products" class="text-decoration-none text-black me-3">
+                <i class="fas fa-arrow-right fa-lg text-primary"></i>
+            </a>
+            <div style="width: 40px; height: 40px; background-color: #ddd; border-radius: 50%; overflow: hidden;">
+                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="ms-2">
+                <h6 class="mb-0 fw-bold">@ViewBag.ReceiverName</h6>
+                <small class="text-muted" style="font-size: 0.8rem;">نشط الآن</small>
+            </div>
+        </div>
+        <i class="fas fa-info-circle fa-lg text-primary"></i>
+    </div>
+
+
+    <div class="chat-content p-3" 
+         style="background-color: white; height: 500px; overflow-y: auto; display: flex; flex-direction: column;">
+        
+        @if (!Model.Any())
+        {
+            <div class="text-center mt-5 text-muted">
+                <p>لا توجد رسائل.. ابدأ الكلام 👋</p>
+            </div>
+        }
+        else
+        {
+            foreach (var msg in Model)
+            {
+                bool isMe = (msg.SenderId == currentUserId);
+                
+              
+                
+                <div class="d-flex mb-2" 
+                     style="justify-content: @(isMe ? "flex-end" : "flex-start");">
+                    <div class="message-bubble @(isMe ? "me" : "them")">
+                        <p class="mb-0" style="font-size: 0.95rem; line-height: 1.4;">
+                            @msg.Content
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex mb-3" 
+                     style="justify-content: @(isMe ? "flex-end" : "flex-start");">
+                    <small class="text-muted" style="font-size: 0.7rem; margin-top: -5px;">
+                        @msg.Timestamp.ToString("hh:mm tt")
+                    </small>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="p-2 border-top bg-white sticky-bottom">
+        <form asp-action="SendMessage" method="post" class="d-flex align-items-center gap-2">
+            <input type="hidden" name="receiverId" value="@ViewBag.ReceiverId" />
+            
+            <i class="fas fa-plus-circle fa-lg text-primary"></i>
+            <i class="fas fa-images fa-lg text-primary"></i>
+            
+            <div class="flex-grow-1 position-relative">
+                <input type="text" 
+                       name="messageContent" 
+                       class="form-control rounded-pill bg-light border-0 px-3" 
+                       placeholder="رسالة..." 
+                       required 
+                       autocomplete="off" 
+                       style="height: 40px;" />
+            </div>
+            
+            <button type="submit" class="btn text-primary p-0">
+                <i class="fas fa-paper-plane fa-lg"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .message-bubble.me {
+        background-color: #0084ff; 
+        color: white;
+        padding: 8px 15px;
+        border-radius: 18px;
+        max-width: 75%;
+        border-bottom-right-radius: 4px; 
+    }
+
+    .message-bubble.them {
+        background-color: #f0f2f5; 
+        color: black;
+        padding: 8px 15px;
+        border-radius: 18px;
+        max-width: 75%;
+        border-bottom-left-radius: 4px; 
+    }
+
+    .chat-content::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .chat-content::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 10px;
+    }
+</style>
+
+<script>
+    window.onload = function() {
+        var chatContent = document.querySelector('.chat-content');
+        chatContent.scrollTop = chatContent.scrollHeight;
+    }
+</script>

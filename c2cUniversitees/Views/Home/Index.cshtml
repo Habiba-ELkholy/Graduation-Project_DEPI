@@ -1,0 +1,139 @@
+﻿@{
+    ViewData["Title"] = "الصفحة الرئيسية";
+}
+
+<style>
+    /* أنماط الصفحة الرئيسية المعدلة */
+
+</style>
+
+<div class="hero-homepage">
+    <div class="hero-content">
+        <h1 class="animate__animated animate__fadeInDown">
+            <span class="highlight">سوق الجامعة</span> للمستعمل 📚
+        </h1>
+
+        <p class="animate__animated animate__fadeInUp delay-1">
+            منصة موثوقة للطلاب لبيع وشراء الكتب والمستلزمات الدراسية والأجهزة الإلكترونية المستعملة بأسعار مناسبة
+        </p>
+
+        <div class="hero-buttons">
+            <a asp-controller="Products" asp-action="Index" class="btn btn-hero btn-hero-primary animate__animated animate__zoomIn delay-2">
+                <i class="fas fa-search"></i> تصفح المنتجات الآن
+            </a>
+
+            <a asp-controller="Account" asp-action="Register" class="btn btn-hero btn-hero-outline animate__animated animate__zoomIn delay-3">
+                <i class="fas fa-user-plus"></i> إنشاء حساب جديد
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- قسم الميزات -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">لماذا تختار سوق الجامعة؟</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card animate__animated">
+                    <div class="feature-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h3>مخصص للطلاب</h3>
+                    <p>منصة حصرية لطلاب الجامعات مع نظام توثيق آمن يضمن بيئة موثوقة للجميع</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card animate__animated">
+                    <div class="feature-icon">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <h3>توفير مالي</h3>
+                    <p>وفر حتى 70% من سعر المنتجات الجديدة بشراء المستعمل واكسب من بيع ما لا تحتاجه</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card animate__animated">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>سهل وسريع</h3>
+                    <p>تصفح الآف المنتجات، أضف إعلاناتك، وتواصل مع البائعين في خطوات بسيطة وسريعة</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- قسم الإحصائيات -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">5,247+</span>
+                    <span class="stat-label">منتج متاح</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">3,892+</span>
+                    <span class="stat-label">طالب مسجل</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">96%</span>
+                    <span class="stat-label">رضا العملاء</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">دعم فني</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        // إضافة تأثيرات scroll animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // تأثيرات الظهور عند التمرير
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate__fadeInUp');
+                    }
+                });
+            }, observerOptions);
+
+            // مراقبة العناصر لإضافة تأثيرات الظهور
+            document.querySelectorAll('.feature-card').forEach(el => {
+                observer.observe(el);
+            });
+
+            // تأثيرات إضافية للأزرار
+            const buttons = document.querySelectorAll('.btn-hero');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+}

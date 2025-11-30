@@ -3,9 +3,9 @@
     public class EmailSettings
     {
         public string SmtpServer { get; set; } = "smtp.gmail.com";
-        public int SmtpPort { get; set; } = 587; // منفذ TLS/STARTTLS
+        public int SmtpPort { get; set; } = 587; 
         public string SenderName { get; set; } = "سوق الجامعة";
-        public string SenderEmail { get; set; } = "Your-Actual-Gmail@gmail.com"; // يجب التغيير
-        public string SenderPassword { get; set; } = "Your-App-Specific-Password"; // يجب التغيير (كلمة مرور التطبيق من Google)
+        public string SenderEmail { get; set; } = "Your-Actual-Gmail@gmail.com"; 
+        public string SenderPassword { get; set; } = "Your-App-Specific-Password"; 
     }
 }

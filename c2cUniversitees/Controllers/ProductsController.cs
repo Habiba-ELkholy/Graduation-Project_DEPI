@@ -4,95 +4,87 @@ using c2cUniversitees.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http; // للوصول إلى Session
-using Microsoft.AspNetCore.Hosting; // لـ IWebHostEnvironment
-using System.Security.Claims; // لاستخدام ClaimTypes.NameIdentifier (إذا كنتِ تستخدمين Identity)
+using Microsoft.AspNetCore.Http; 
+using Microsoft.AspNetCore.Hosting; 
+using System.Security.Claims; 
 
 namespace c2cUniversitees.Controllers
 {
-    // يجب أن يرث الكلاس من Controller
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _hostEnvironment;
 
-        // دالة البناء (Constructor) لحقن DbContext و IWebHostEnvironment
         public ProductsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
             _hostEnvironment = hostEnvironment;
         }
 
-        // 1. عرض قائمة المنتجات (Read - Index) والفلترة
         [Authorize]
         public async Task<IActionResult> Index(string college)
         {
-            // 1. هات كل المنتجات
             var products = _context.Products.Include(p => p.Seller).AsQueryable();
 
             if (!string.IsNullOrEmpty(college))
             {
                 products = products.Where(p => p.Seller.CollegeName == college);
             }
-
-            // 2. (الجزء الجديد) هات قايمة الحاجات اللي أنا عاملها مفضلة
+            
             var myId = HttpContext.Session.GetInt32("UserId");
             if (myId.HasValue)
             {
                 var myWishlistIds = await _context.WishlistItems
       .Where(w => w.UserId == myId)
       .Select(w => w.ProductId)
-      .ToListAsync(); // <-- لازم تكون Async عشان الـ await اللي في الأول
+      .ToListAsync(); 
 
-                // ابعتها للشاشة عشان تلون القلوب
                 ViewBag.WishlistIds = myWishlistIds;
             }
 
-            // 3. (تجهيز الفلتر القديم زي ما هو)
             var colleges = new List<string> { "هندسة", "طب", "حاسبات", "تجارة", "أخرى / غير محدد" };
             ViewBag.FilterOptions = colleges.Select(c => new Tuple<string, bool>(c, c == college)).ToList();
 
             return View(await products.ToListAsync());
         }
 
-        // 2. نموذج إضافة منتج جديد (Create - GET)
-        [Authorize] // يتطلب تسجيل دخول
+        [Authorize]
         public IActionResult Create()
         {
-            // قائمة الفئات لتمريرها للـ View
+            
             ViewBag.Categories = new List<string> { "هندسة", "فنون", "علوم", "آثار", "أدوات تخرج", "كتب", "أثاث", "إلكترونيات", "أخرى" };
             return View();
         }
 
-        // 3. معالجة بيانات الإضافة (Create - POST)
+        
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,Description,Price,Category,ImageFile")] ProductViewModel model)
         {
-            // قائمة الفئات تحتاج إلى أن تكون متاحة إذا فشل التحقق
+          
             var categories = new List<string> { "هندسة", "فنون", "علوم", "آثار", "أدوات تخرج", "كتب", "أثاث", "إلكترونيات", "أخرى" };
 
-            // **1. التحقق من هوية المستخدم**
+            
             int? sellerId = HttpContext.Session.GetInt32("UserId");
             if (!sellerId.HasValue)
             {
-                // إذا لم يكن هناك ID، يجب توجيهه لصفحة تسجيل الدخول
+                
                 return RedirectToAction("Login", "Account");
             }
 
             if (ModelState.IsValid)
             {
-                // **2. حفظ الصورة على الخادم**
+               
                 string uniqueFileName = null;
                 if (model.ImageFile != null)
                 {
                     string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images");
-                    // توليد اسم فريد لتجنب التعارض
+                    
                     uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    // إنشاء مجلد الصور إذا لم يكن موجوداً
+                    
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -101,7 +93,7 @@ namespace c2cUniversitees.Controllers
                     }
                 }
 
-                // **3. إنشاء كائن المنتج وتعيين SellerId**
+                
                 var product = new Product
                 {
                     Title = model.Title,
@@ -114,21 +106,21 @@ namespace c2cUniversitees.Controllers
 
                 _context.Add(product);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index)); // النجاح
+                return RedirectToAction(nameof(Index)); 
             }
 
-            // 4. إذا فشل التحقق، أعد عرض النموذج مع رسائل الخطأ
+           
             ViewBag.Categories = categories;
             return View(model);
         }
 
-        // 4. معالجة وضع علامة "تم البيع" (Sold - POST)
+        
         [HttpPost, ActionName("Sold")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SoldConfirmed(int id)
         {
             var product = await _context.Products.FindAsync(id);
-            // الحصول على ID المستخدم الحالي من الجلسة
+            
             int? currentUserId = HttpContext.Session.GetInt32("UserId");
 
             if (product == null)
@@ -136,10 +128,10 @@ namespace c2cUniversitees.Controllers
                 return NotFound();
             }
 
-            // **التحقق الأمني:** يجب أن يتطابق البائع مع المُسجل دخوله
+            
             if (!currentUserId.HasValue || product.SellerId != currentUserId.Value)
             {
-                return Unauthorized(); // منع أي شخص آخر من حذف المنتج
+                return Unauthorized(); 
             }
 
             product.IsSold = true;
@@ -149,7 +141,7 @@ namespace c2cUniversitees.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // 5. عرض صفحة تفاصيل المنتج (Details - GET)
+        
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

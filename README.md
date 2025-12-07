@@ -14,7 +14,7 @@ A C2C web application for university students to buy and sell used educational m
 * **Radwa Elmodather Adly**
 * **Sotir Milad**
 * **Walaa Rafat**
-* **Abanoub**
+* **Abanoub Wagih**
 
 ---
 *Graduation Project - DEPI 2025*
